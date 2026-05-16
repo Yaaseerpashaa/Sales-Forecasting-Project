@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sales Forecasting AI</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+
+  <!-- Our CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+
+<!-- ══════════ HEADER ══════════ -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo">
+      <span class="logo-icon">📈</span>
+      <span class="logo-text">SalesForecast<span class="accent">AI</span></span>
+    </div>
+    <p class="tagline">Machine Learning · Time-Series · XGBoost</p>
+  </div>
+</header>
+
+<!-- ══════════ HERO ══════════ -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>Predict Your <span class="gradient-text">Future Sales</span></h1>
+    <p class="hero-sub">
+      Powered by Linear Regression, Random Forest &amp; XGBoost.
+      Enter your store parameters and get an instant AI forecast.
+    </p>
+  </div>
+  <!-- Floating orbs for visual depth -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+</section>
+
+<!-- ══════════ MAIN CONTENT ══════════ -->
+<main class="container">
+
+  <!-- ─── PREDICTION RESULT ─── -->
+  {% if prediction is not none %}
+  <div class="result-card success">
+    <div class="result-icon">🎯</div>
+    <div class="result-body">
+      <p class="result-label">Predicted Sales Amount</p>
+      <p class="result-value">
+        $&nbsp;{{ "{:,.2f}".format(prediction) }}
+      </p>
+      <p class="result-note">Based on your input features using the best-performing ML model</p>
+    </div>
+  </div>
+  {% endif %}
+
+  {% if error %}
+  <div class="result-card error">
+    <div class="result-icon">⚠️</div>
+    <div class="result-body">
+      <p class="result-label">Prediction Error</p>
+      <p class="result-note">{{ error }}</p>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ─── INPUT FORM ─── -->
+  <div class="card form-card">
+    <div class="card-header">
+      <h2>🔧 Enter Sales Parameters</h2>
+      <p>Fill in the fields below and click <strong>Predict</strong></p>
+    </div>
+
+    <form action="/predict" method="POST" class="predict-form">
+
+      <div class="form-grid">
+
+        <!-- ── Common fields always shown ── -->
+        <div class="form-group">
+          <label for="Store">Store ID</label>
+          <input type="number" id="Store" name="Store"
+                 placeholder="e.g. 1" min="1" step="1" value="1"/>
+          <span class="hint">Store number (1–5)</span>
+        </div>
+
+        <div class="form-group">
+          <label for="Department">Department Code</label>
+          <input type="number" id="Department" name="Department"
+                 placeholder="e.g. 0" min="0" step="1" value="0"/>
+          <span class="hint">0=Electronics, 1=Clothing, 2=Grocery, 3=Toys</span>
+        </div>
+
+        <div class="form-group">
+          <label for="Year">Year</label>
+          <input type="number" id="Year" name="Year"
+                 placeholder="e.g. 2024" min="2020" max="2030" value="2024"/>
+        </div>
+
+        <div class="form-group">
+          <label for="Month">Month</label>
+          <input type="number" id="Month" name="Month"
+                 placeholder="1–12" min="1" max="12" value="6"/>
+        </div>
+
+        <div class="form-group">
+          <label for="Week">Week of Year</label>
+          <input type="number" id="Week" name="Week"
+                 placeholder="1–52" min="1" max="52" value="26"/>
+        </div>
+
+        <div class="form-group">
+          <label for="DayOfWeek">Day of Week</label>
+          <input type="number" id="DayOfWeek" name="DayOfWeek"
+                 placeholder="0=Mon … 6=Sun" min="0" max="6" value="1"/>
+        </div>
+
+        <div class="form-group">
+          <label for="Quarter">Quarter</label>
+          <input type="number" id="Quarter" name="Quarter"
+                 placeholder="1–4" min="1" max="4" value="2"/>
+        </div>
+
+        <div class="form-group">
+          <label for="IsWeekend">Is Weekend?</label>
+          <select id="IsWeekend" name="IsWeekend">
+            <option value="0">No (Weekday)</option>
+            <option value="1">Yes (Weekend)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="Promotion">Promotion Active?</label>
+          <select id="Promotion" name="Promotion">
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="Holiday">Public Holiday?</label>
+          <select id="Holiday" name="Holiday">
+            <option value="0">No</option>
+            <option value="1">Yes</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="Temperature">Temperature (°C)</label>
+          <input type="number" id="Temperature" name="Temperature"
+                 placeholder="e.g. 28" step="0.1" value="28"/>
+        </div>
+
+        <div class="form-group">
+          <label for="Fuel_Price">Fuel Price ($)</label>
+          <input type="number" id="Fuel_Price" name="Fuel_Price"
+                 placeholder="e.g. 3.5" step="0.01" value="3.5"/>
+        </div>
+
+        <div class="form-group">
+          <label for="CPI">CPI (Consumer Price Index)</label>
+          <input type="number" id="CPI" name="CPI"
+                 placeholder="e.g. 211" step="0.01" value="211"/>
+        </div>
+
+        <div class="form-group">
+          <label for="Unemployment">Unemployment Rate (%)</label>
+          <input type="number" id="Unemployment" name="Unemployment"
+                 placeholder="e.g. 7.5" step="0.1" value="7.5"/>
+        </div>
+
+      </div><!-- /form-grid -->
+
+      <div class="form-footer">
+        <button type="submit" class="btn-predict">
+          <span>⚡</span> Predict Sales
+        </button>
+        <button type="reset" class="btn-reset">Reset</button>
+      </div>
+
+    </form>
+  </div><!-- /form-card -->
+
+  <!-- ─── MODEL INFO CARDS ─── -->
+  <section class="info-section">
+    <h2 class="section-title">🤖 Models Used</h2>
+    <div class="info-grid">
+      <div class="info-card">
+        <div class="info-icon">📏</div>
+        <h3>Linear Regression</h3>
+        <p>A simple baseline model that draws a straight line through the data. Fast and interpretable.</p>
+      </div>
+      <div class="info-card highlight">
+        <div class="info-badge">⭐ Best Model</div>
+        <div class="info-icon">🌲</div>
+        <h3>Random Forest</h3>
+        <p>An ensemble of 100 decision trees. Handles non-linear patterns and is robust to outliers.</p>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">🚀</div>
+        <h3>XGBoost</h3>
+        <p>Gradient boosting champion. State-of-the-art performance on tabular data.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── CHARTS ─── -->
+  {% if plots %}
+  <section class="charts-section">
+    <h2 class="section-title">📊 Training Analysis Charts</h2>
+    <div class="charts-grid">
+      {% for plot in plots %}
+      <div class="chart-card">
+        <img src="{{ url_for('static', filename=plot) }}"
+             alt="Chart: {{ plot }}" loading="lazy"/>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+</main>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer class="site-footer">
+  <p>Built with ❤️ using Python · Flask · XGBoost · Scikit-learn</p>
+  <p class="footer-sub">Sales Forecasting Internship Project</p>
+</footer>
+
+</body>
+</html>

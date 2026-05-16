@@ -1,0 +1,12 @@
+Place your sales.csv file here.
+
+If you don't have one, just run:
+    python train_model.py
+
+The script will auto-generate a realistic sample dataset for you.
+
+To use a real dataset:
+- Download from Kaggle (see README.md for links)
+- Rename it to sales.csv
+- Place it in this folder
+- Run python train_model.py
